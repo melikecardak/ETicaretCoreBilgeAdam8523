@@ -48,12 +48,19 @@ namespace AppCore.DataAccess.EntityFramework.Bases
 
         public IQueryable<TEntity> Query(params string[] entitiesToInclude)
         {
-            throw new NotImplementedException();
+            var query = DbContext.Set<TEntity>().AsQueryable();
+            foreach (var entityToInclude in entitiesToInclude)
+            {
+                query = query.Include(entityToInclude);
+            }
+            return query;
         }
 
         public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate, params string[] entitiesToInclude)
         {
-            throw new NotImplementedException();
+            var query = Query(entitiesToInclude);
+            query = query.Where(predicate);
+            return query;
         }
 
         public int Save()
@@ -70,7 +77,9 @@ namespace AppCore.DataAccess.EntityFramework.Bases
 
         public void Update(TEntity entity, bool save = true)
         {
-            throw new NotImplementedException();
+            DbContext.Set<TEntity>().Update(entity);
+            if (save)
+                Save();
         }
     }
 }
